@@ -5,7 +5,7 @@ SettingsView = require '../lib/settings-view'
 PackageKeymapView = require '../lib/package-keymap-view'
 _ = require 'underscore-plus'
 SnippetsProvider =
-  getSnippets: -> atom.config.scopedSettingsStore.propertySets
+  getSnippets: -> soldat.config.scopedSettingsStore.propertySets
 
 describe "InstalledPackageView", ->
   beforeEach ->
@@ -15,10 +15,10 @@ describe "InstalledPackageView", ->
     settingsPanels = null
 
     waitsForPromise ->
-      atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
+      soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
 
     runs ->
-      pack = atom.packages.getActivePackage('language-test')
+      pack = soldat.packages.getActivePackage('language-test')
       view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
       settingsPanels = view.element.querySelectorAll('.package-grammars .settings-panel')
 
@@ -40,7 +40,7 @@ describe "InstalledPackageView", ->
     snippetsModule = null
 
     waitsForPromise ->
-      atom.packages.activatePackage('snippets').then (p) ->
+      soldat.packages.activatePackage('snippets').then (p) ->
         snippetsModule = p.mainModule
         return unless snippetsModule.provideSnippets().getUnparsedSnippets?
 
@@ -48,13 +48,13 @@ describe "InstalledPackageView", ->
           getSnippets: -> snippetsModule.provideSnippets().getUnparsedSnippets()
 
     waitsForPromise ->
-      atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
+      soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
 
     waitsFor 'snippets to load', (done) ->
       snippetsModule.onDidLoadSnippets(done)
 
     runs ->
-      pack = atom.packages.getActivePackage('language-test')
+      pack = soldat.packages.getActivePackage('language-test')
       view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
       snippetsTable = view.element.querySelector('.package-snippets-table tbody')
 
@@ -74,10 +74,10 @@ describe "InstalledPackageView", ->
     keybindingsTable = null
 
     waitsForPromise ->
-      atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
+      soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
 
     runs ->
-      pack = atom.packages.getActivePackage('language-test')
+      pack = soldat.packages.getActivePackage('language-test')
       view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
       keybindingsTable = view.element.querySelector('.package-keymap-table tbody')
       expect(keybindingsTable.children.length).toBe 1
@@ -85,26 +85,26 @@ describe "InstalledPackageView", ->
   describe "when the keybindings toggle is clicked", ->
     it "sets the packagesWithKeymapsDisabled config to include the package name", ->
       waitsForPromise ->
-        atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
+        soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
 
       runs ->
-        pack = atom.packages.getActivePackage('language-test')
+        pack = soldat.packages.getActivePackage('language-test')
         card = new PackageKeymapView(pack)
         jasmine.attachToDOM(card.element)
 
         card.refs.keybindingToggle.click()
         expect(card.refs.keybindingToggle.checked).toBe false
-        expect(_.include(atom.config.get('core.packagesWithKeymapsDisabled') ? [], 'language-test')).toBe true
+        expect(_.include(soldat.config.get('core.packagesWithKeymapsDisabled') ? [], 'language-test')).toBe true
 
-        if atom.keymaps.build?
+        if soldat.keymaps.build?
           keybindingRows = card.element.querySelectorAll('.package-keymap-table tbody.text-subtle tr')
           expect(keybindingRows.length).toBe 1
 
         card.refs.keybindingToggle.click()
         expect(card.refs.keybindingToggle.checked).toBe true
-        expect(_.include(atom.config.get('core.packagesWithKeymapsDisabled') ? [], 'language-test')).toBe false
+        expect(_.include(soldat.config.get('core.packagesWithKeymapsDisabled') ? [], 'language-test')).toBe false
 
-        if atom.keymaps.build?
+        if soldat.keymaps.build?
           keybindingRows = card.element.querySelectorAll('.package-keymap-table tbody tr')
           expect(keybindingRows.length).toBe 1
 
@@ -113,26 +113,26 @@ describe "InstalledPackageView", ->
 
     beforeEach ->
       waitsForPromise ->
-        atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
+        soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'language-test'))
 
       runs ->
-        pack = atom.packages.getActivePackage('language-test')
+        pack = soldat.packages.getActivePackage('language-test')
         card = new PackageKeymapView(pack)
 
     describe "when the keybinding file ends in .cson", ->
       it "writes a CSON snippet to the clipboard", ->
-        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
+        spyOn(soldat.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
         card.element.querySelector('.copy-icon').click()
-        expect(atom.clipboard.read()).toBe """
+        expect(soldat.clipboard.read()).toBe """
           'test':
             'cmd-g': 'language-test:run'
         """
 
     describe "when the keybinding file ends in .json", ->
       it "writes a JSON snippet to the clipboard", ->
-        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn 'keymap.json'
+        spyOn(soldat.keymaps, 'getUserKeymapPath').andReturn 'keymap.json'
         card.element.querySelector('.copy-icon').click()
-        expect(atom.clipboard.read()).toBe """
+        expect(soldat.clipboard.read()).toBe """
           "test": {
             "cmd-g": "language-test:run"
           }
@@ -143,62 +143,62 @@ describe "InstalledPackageView", ->
       packageCard = null
 
       waitsForPromise ->
-        atom.packages.activatePackage('status-bar')
+        soldat.packages.activatePackage('status-bar')
 
       runs ->
-        expect(atom.packages.isPackageActive('status-bar')).toBe(true)
-        pack = atom.packages.getLoadedPackage('status-bar')
+        expect(soldat.packages.isPackageActive('status-bar')).toBe(true)
+        pack = soldat.packages.getLoadedPackage('status-bar')
         view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
         packageCard = view.element.querySelector('.package-card')
 
       runs ->
         # Trigger observeDisabledPackages() here
         # because it is not default in specs
-        atom.packages.observeDisabledPackages()
-        atom.packages.disablePackage('status-bar')
-        expect(atom.packages.isPackageDisabled('status-bar')).toBe(true)
+        soldat.packages.observeDisabledPackages()
+        soldat.packages.disablePackage('status-bar')
+        expect(soldat.packages.isPackageDisabled('status-bar')).toBe(true)
         expect(packageCard.classList.contains('disabled')).toBe(true)
 
   describe "when the package is not active", ->
     it "displays the correct enablement state", ->
-      atom.packages.loadPackage('status-bar')
-      expect(atom.packages.isPackageActive('status-bar')).toBe(false)
-      pack = atom.packages.getLoadedPackage('status-bar')
+      soldat.packages.loadPackage('status-bar')
+      expect(soldat.packages.isPackageActive('status-bar')).toBe(false)
+      pack = soldat.packages.getLoadedPackage('status-bar')
       view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
       packageCard = view.element.querySelector('.package-card')
 
       # Trigger observeDisabledPackages() here
       # because it is not default in specs
-      atom.packages.observeDisabledPackages()
-      atom.packages.disablePackage('status-bar')
-      expect(atom.packages.isPackageDisabled('status-bar')).toBe(true)
+      soldat.packages.observeDisabledPackages()
+      soldat.packages.disablePackage('status-bar')
+      expect(soldat.packages.isPackageDisabled('status-bar')).toBe(true)
       expect(packageCard.classList.contains('disabled')).toBe(true)
 
     it "still loads the config schema for the package", ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
 
       waitsFor ->
-        atom.packages.isPackageLoaded('package-with-config') is true
+        soldat.packages.isPackageLoaded('package-with-config') is true
 
       runs ->
-        expect(atom.config.get('package-with-config.setting')).toBe undefined
+        expect(soldat.config.get('package-with-config.setting')).toBe undefined
 
-        pack = atom.packages.getLoadedPackage('package-with-config')
+        pack = soldat.packages.getLoadedPackage('package-with-config')
         new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)
 
-        expect(atom.config.get('package-with-config.setting')).toBe 'something'
+        expect(soldat.config.get('package-with-config.setting')).toBe 'something'
 
   describe "when the package was not installed from atom.io", ->
     normalizePackageDataReadmeError = 'ERROR: No README data found!'
 
     it "still displays the Readme", ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
 
       waitsFor ->
-        atom.packages.isPackageLoaded('package-with-readme') is true
+        soldat.packages.isPackageLoaded('package-with-readme') is true
 
       runs ->
-        pack = atom.packages.getLoadedPackage('package-with-readme')
+        pack = soldat.packages.getLoadedPackage('package-with-readme')
         expect(pack.metadata.readme).toBe normalizePackageDataReadmeError
 
         view = new PackageDetailView(pack, new SettingsView(), new PackageManager(), SnippetsProvider)

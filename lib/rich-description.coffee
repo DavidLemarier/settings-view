@@ -13,5 +13,5 @@ markdown = (text) ->
 
 module.exports =
   getSettingDescription: (keyPath) ->
-    description = atom.config.getSchema(keyPath)?.description or ''
+    description = soldat.config.getSchema(keyPath)?.description or ''
     markdown(description)

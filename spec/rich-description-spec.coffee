@@ -106,7 +106,7 @@ describe "Rich descriptions", ->
           type: 'string'
           default: ''
 
-    atom.config.setSchema("foo", config)
+    soldat.config.setSchema("foo", config)
 
   describe 'supported Markdown', ->
     it 'handles plain text', ->

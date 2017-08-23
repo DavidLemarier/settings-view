@@ -81,7 +81,7 @@ describe 'InstalledPackagesPanel', ->
       spyOn(@packageManager, 'runCommand').andCallFake (args, callback) ->
         installCallback = callback
         onWillThrowError: ->
-      spyOn(atom.packages, 'activatePackage').andCallFake (name) =>
+      spyOn(soldat.packages, 'activatePackage').andCallFake (name) =>
         @installed.user.push {name}
 
       expect(@panel.refs.communityCount.textContent.trim()).toBe '1'
@@ -124,14 +124,14 @@ describe 'InstalledPackagesPanel', ->
       jasmine.attachToDOM(@panel.element)
 
       [updateCallback] = []
-      spyOn(atom.packages, 'isDeprecatedPackage').andCallFake =>
+      spyOn(soldat.packages, 'isDeprecatedPackage').andCallFake =>
         return true if @installed.user[0].version is '1.0.0'
         false
       spyOn(@packageManager, 'runCommand').andCallFake (args, callback) ->
         updateCallback = callback
         onWillThrowError: ->
-          atom.packages.activatePackage
-      spyOn(atom.packages, 'activatePackage').andCallFake (name) =>
+          soldat.packages.activatePackage
+      spyOn(soldat.packages, 'activatePackage').andCallFake (name) =>
         @installed.user[0].version = '1.1.0'
 
       expect(@panel.refs.deprecatedSection).not.toBeVisible()
@@ -158,7 +158,7 @@ describe 'InstalledPackagesPanel', ->
       spyOn(@packageManager, 'getOutdated').andReturn new Promise ->
       spyOn(@packageManager, 'loadCompatiblePackageVersion').andCallFake ->
       spyOn(@packageManager, 'getInstalled').andReturn Promise.resolve(@installed)
-      spyOn(atom.packages, 'isDeprecatedPackage').andCallFake =>
+      spyOn(soldat.packages, 'isDeprecatedPackage').andCallFake =>
         return true if @installed.user[0].version is '1.0.0'
         false
 

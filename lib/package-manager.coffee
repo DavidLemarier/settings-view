@@ -1,8 +1,8 @@
 _ = require 'underscore-plus'
-{BufferedProcess, CompositeDisposable, Emitter} = require 'atom'
+{BufferedProcess, CompositeDisposable, Emitter} = require 'soldat'
 semver = require 'semver'
 
-Client = require './atom-io-client'
+Client = require './soldat-tv-client'
 
 module.exports =
 class PackageManager
@@ -22,23 +22,23 @@ class PackageManager
     @client ?= new Client(this)
 
   isPackageInstalled: (packageName) ->
-    if atom.packages.isPackageLoaded(packageName)
+    if soldat.packages.isPackageLoaded(packageName)
       true
     else
-      atom.packages.getAvailablePackageNames().indexOf(packageName) > -1
+      soldat.packages.getAvailablePackageNames().indexOf(packageName) > -1
 
   packageHasSettings: (packageName) ->
-    grammars = atom.grammars.getGrammars() ? []
+    grammars = soldat.grammars.getGrammars() ? []
     for grammar in grammars when grammar.path
       return true if grammar.packageName is packageName
 
-    pack = atom.packages.getLoadedPackage(packageName)
-    pack.activateConfig() if pack? and not atom.packages.isPackageActive(packageName)
-    schema = atom.config.getSchema(packageName)
+    pack = soldat.packages.getLoadedPackage(packageName)
+    pack.activateConfig() if pack? and not soldat.packages.isPackageActive(packageName)
+    schema = soldat.config.getSchema(packageName)
     schema? and (schema.type isnt 'any')
 
   setProxyServers: (callback) =>
-    session = atom.getCurrentWindow().webContents.session
+    session = soldat.getCurrentWindow().webContents.session
     session.resolveProxy 'http://atom.io', (httpProxy) =>
       @applyProxyToEnv('http_proxy', httpProxy)
       session.resolveProxy 'https://atom.io', (httpsProxy) =>
@@ -46,8 +46,8 @@ class PackageManager
         callback()
 
   setProxyServersAsync: (callback) =>
-    httpProxyPromise = atom.resolveProxy('http://atom.io').then((proxy) => @applyProxyToEnv('http_proxy', proxy))
-    httpsProxyPromise = atom.resolveProxy('https://atom.io').then((proxy) => @applyProxyToEnv('https_proxy', proxy))
+    httpProxyPromise = soldat.resolveProxy('http://atom.io').then((proxy) => @applyProxyToEnv('http_proxy', proxy))
+    httpsProxyPromise = soldat.resolveProxy('https://atom.io').then((proxy) => @applyProxyToEnv('https_proxy', proxy))
     Promise.all([httpProxyPromise, httpsProxyPromise]).then(callback)
 
   applyProxyToEnv: (envName, proxy) ->
@@ -59,7 +59,7 @@ class PackageManager
     return
 
   runCommand: (args, callback) ->
-    command = atom.packages.getApmPath()
+    command = soldat.packages.getApmPath()
     outputLines = []
     stdout = (lines) -> outputLines.push(lines)
     errorLines = []
@@ -69,9 +69,9 @@ class PackageManager
 
     args.push('--no-color')
 
-    if atom.config.get('core.useProxySettingsWhenCallingApm')
+    if soldat.config.get('core.useProxySettingsWhenCallingApm')
       bufferedProcess = new BufferedProcess({command, args, stdout, stderr, exit, autoStart: false})
-      if atom.resolveProxy?
+      if soldat.resolveProxy?
         @setProxyServersAsync -> bufferedProcess.start()
       else
         @setProxyServers -> bufferedProcess.start()
@@ -104,7 +104,7 @@ class PackageManager
       loadThemes = false
 
     args = ['featured', '--json']
-    version = atom.getVersion()
+    version = soldat.getVersion()
     args.push('--themes') if loadThemes
     args.push('--compatible', version) if semver.valid(version)
     errorMessage = 'Fetching featured packages failed.'
@@ -134,7 +134,7 @@ class PackageManager
       return callback(null, @apmCache.loadOutdated.value)
 
     args = ['outdated', '--json']
-    version = atom.getVersion()
+    version = soldat.getVersion()
     args.push('--compatible', version) if semver.valid(version)
     errorMessage = 'Fetching outdated packages and themes failed.'
 
@@ -165,7 +165,7 @@ class PackageManager
     handleProcessErrors(apmProcess, errorMessage, callback)
 
   getVersionPinnedPackages: ->
-    atom.config.get('core.versionPinnedPackages') ? []
+    soldat.config.get('core.versionPinnedPackages') ? []
 
   clearOutdatedCache: ->
     @apmCache.loadOutdated =
@@ -194,7 +194,7 @@ class PackageManager
     handleProcessErrors(apmProcess, errorMessage, callback)
 
   loadCompatiblePackageVersion: (packageName, callback) ->
-    args = ['view', packageName, '--json', '--compatible', @normalizeVersion(atom.getVersion())]
+    args = ['view', packageName, '--json', '--compatible', @normalizeVersion(soldat.getVersion())]
     errorMessage = "Fetching package '#{packageName}' failed."
 
     apmProcess = @runCommand args, (code, stdout, stderr) ->
@@ -247,7 +247,7 @@ class PackageManager
           resolve(result)
 
   satisfiesVersion: (version, metadata) ->
-    engine = metadata.engines?.atom ? '*'
+    engine = metadata.engines?.soldat ? '*'
     return false unless semver.validRange(engine)
     return semver.satisfies(version, engine)
 
@@ -318,14 +318,14 @@ class PackageManager
     handleProcessErrors(apmProcess, errorMessage, onError)
 
   unload: (name) ->
-    if atom.packages.isPackageLoaded(name)
-      atom.packages.deactivatePackage(name) if atom.packages.isPackageActive(name)
-      atom.packages.unloadPackage(name)
+    if soldat.packages.isPackageLoaded(name)
+      soldat.packages.deactivatePackage(name) if soldat.packages.isPackageActive(name)
+      soldat.packages.unloadPackage(name)
 
   install: (pack, callback) ->
     {name, version, theme} = pack
-    activateOnSuccess = not theme and not atom.packages.isPackageDisabled(name)
-    activateOnFailure = atom.packages.isPackageActive(name)
+    activateOnSuccess = not theme and not soldat.packages.isPackageDisabled(name)
+    activateOnFailure = soldat.packages.isPackageActive(name)
     nameWithVersion = if version? then "#{name}@#{version}" else name
 
     @unload(name)
@@ -348,14 +348,14 @@ class PackageManager
           # using old apm without --json support
         @clearOutdatedCache()
         if activateOnSuccess
-          atom.packages.activatePackage(name)
+          soldat.packages.activatePackage(name)
         else
-          atom.packages.loadPackage(name)
+          soldat.packages.loadPackage(name)
 
         callback?()
         @emitPackageEvent 'installed', pack
       else
-        atom.packages.activatePackage(name) if activateOnFailure
+        soldat.packages.activatePackage(name) if activateOnFailure
         error = new Error(errorMessage)
         error.stdout = stdout
         error.stderr = stderr
@@ -368,7 +368,7 @@ class PackageManager
   uninstall: (pack, callback) ->
     {name} = pack
 
-    atom.packages.deactivatePackage(name) if atom.packages.isPackageActive(name)
+    soldat.packages.deactivatePackage(name) if soldat.packages.isPackageActive(name)
 
     errorMessage = "Uninstalling \u201C#{name}\u201D failed."
     onError = (error) =>
@@ -445,7 +445,7 @@ class PackageManager
         reject(error)
 
   removePackageNameFromDisabledPackages: (packageName) ->
-    atom.config.removeAtKeyPath('core.disabledPackages', packageName)
+    soldat.config.removeAtKeyPath('core.disabledPackages', packageName)
 
   # Emits the appropriate event for the given package.
   #

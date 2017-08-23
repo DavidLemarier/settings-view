@@ -16,16 +16,16 @@ describe "PackageUpdatesStatusView", ->
     spyOn(PackageManager.prototype, 'getInstalled').andCallFake -> Promise.resolve([installedPackage])
     spyOn(PackageManager.prototype, 'getOutdated').andCallFake -> Promise.resolve([outdatedPackage1, outdatedPackage2])
     spyOn(PackageUpdatesStatusView.prototype, 'initialize').andCallThrough()
-    jasmine.attachToDOM(atom.views.getView(atom.workspace))
+    jasmine.attachToDOM(soldat.views.getView(soldat.workspace))
 
     waitsForPromise ->
-      atom.packages.activatePackage('status-bar')
+      soldat.packages.activatePackage('status-bar')
 
     waitsForPromise ->
-      atom.packages.activatePackage('settings-view')
+      soldat.packages.activatePackage('settings-view')
 
     runs ->
-      atom.packages.emitter.emit('did-activate-all')
+      soldat.packages.emitter.emit('did-activate-all')
       expect(document.querySelector('status-bar .package-updates-status-view')).toExist()
 
       packageManager = PackageUpdatesStatusView.prototype.initialize.mostRecentCall.args[1]
@@ -36,10 +36,10 @@ describe "PackageUpdatesStatusView", ->
 
   describe "when the tile is clicked", ->
     it "opens the Available Updates panel", ->
-      spyOn(atom.commands, 'dispatch').andCallFake ->
+      spyOn(soldat.commands, 'dispatch').andCallFake ->
 
       document.querySelector('status-bar .package-updates-status-view').click()
-      expect(atom.commands.dispatch).toHaveBeenCalledWith(atom.views.getView(atom.workspace), 'settings-view:check-for-package-updates')
+      expect(soldat.commands.dispatch).toHaveBeenCalledWith(soldat.views.getView(soldat.workspace), 'settings-view:check-for-package-updates')
 
     it "does not destroy the tile", ->
       document.querySelector('status-bar .package-updates-status-view').click()

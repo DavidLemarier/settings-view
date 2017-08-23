@@ -1,4 +1,4 @@
-{Emitter} = require 'atom'
+{Emitter} = require 'soldat'
 
 module.exports =
 class List

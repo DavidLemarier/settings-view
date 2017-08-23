@@ -15,8 +15,8 @@ ownerFromRepository = (repository) ->
   repo.match(loginRegex)?[1] ? ''
 
 packageComparatorAscending = (left, right) ->
-  leftStatus = atom.packages.isPackageDisabled(left.name)
-  rightStatus = atom.packages.isPackageDisabled(right.name)
+  leftStatus = soldat.packages.isPackageDisabled(left.name)
+  rightStatus = soldat.packages.isPackageDisabled(right.name)
   if leftStatus is rightStatus
     if left.name > right.name
       -1

@@ -39,13 +39,13 @@ describe "SettingsPanel", ->
               {value: 'one', description: 'One'}
               'Two'
             ]
-      atom.config.setSchema("foo", config)
-      atom.config.setDefaults("foo", gong: 'gong')
-      expect(_.size(atom.config.get('foo'))).toBe 6
+      soldat.config.setSchema("foo", config)
+      soldat.config.setDefaults("foo", gong: 'gong')
+      expect(_.size(soldat.config.get('foo'))).toBe 6
       settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false})
 
     it "sorts settings by order and then alphabetically by the key", ->
-      settings = atom.config.get('foo')
+      settings = soldat.config.get('foo')
       expect(_.size(settings)).toBe 6
       sortedSettings = settingsPanel.sortSettings("foo", settings)
       expect(sortedSettings[0]).toBe 'zing'
@@ -82,9 +82,9 @@ describe "SettingsPanel", ->
             description: 'Setting for testing zero as a default'
             type: 'integer'
             default: 0
-      atom.config.setSchema("foo", config)
-      atom.config.setDefaults("foo", gong: 'gong')
-      expect(_.size(atom.config.get('foo'))).toBe 3
+      soldat.config.setSchema("foo", config)
+      soldat.config.setDefaults("foo", gong: 'gong')
+      expect(_.size(soldat.config.get('foo'))).toBe 3
       settingsPanel = new SettingsPanel({namespace: "foo", includeTitle: false})
 
     it 'ensures default stays default', ->
@@ -98,7 +98,7 @@ describe "SettingsPanel", ->
       expect(settingsPanel.isDefault('foo.haz')).toBe true
       settingsPanel.set('foo.haz', 'newhaz')
       expect(settingsPanel.isDefault('foo.haz')).toBe false
-      expect(atom.config.get('foo.haz')).toBe 'newhaz'
+      expect(soldat.config.get('foo.haz')).toBe 'newhaz'
 
     # Regression test for #783
     it 'allows 0 to be a default', ->
@@ -122,8 +122,8 @@ describe "SettingsPanel", ->
             '.source.python':
               default: 4
 
-        atom.config.setScopedDefaultsFromSchema('editor.tabLength', schema)
-        expect(atom.config.get('editor.tabLength')).toBe(2)
+        soldat.config.setScopedDefaultsFromSchema('editor.tabLength', schema)
+        expect(soldat.config.get('editor.tabLength')).toBe(2)
 
       it 'displays the scoped default', ->
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.python'})
@@ -132,7 +132,7 @@ describe "SettingsPanel", ->
         expect(tabLengthEditor.getModel().getPlaceholderText()).toBe('Default: 4')
 
       it 'allows the scoped setting to be changed to its normal default if the unscoped value is different', ->
-        atom.config.set('editor.tabLength', 8)
+        soldat.config.set('editor.tabLength', 8)
 
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.js'})
         tabLengthEditor = settingsPanel.element.querySelector('[id="editor.tabLength"]')
@@ -142,7 +142,7 @@ describe "SettingsPanel", ->
         # This is the unscoped default, but it differs from the current unscoped value
         settingsPanel.set('editor.tabLength', 2)
         expect(tabLengthEditor.getModel().getText()).toBe('2')
-        expect(atom.config.get('editor.tabLength', {scope: ['source.js']})).toBe(2)
+        expect(soldat.config.get('editor.tabLength', {scope: ['source.js']})).toBe(2)
 
       it 'allows the scoped setting to be changed to the unscoped default if it is different', ->
         settingsPanel = new SettingsPanel({namespace: "editor", includeTitle: false, scopeName: '.source.python'})
@@ -153,7 +153,7 @@ describe "SettingsPanel", ->
         # This is the unscoped default, but it differs from the scoped default
         settingsPanel.set('editor.tabLength', 2)
         expect(tabLengthEditor.getModel().getText()).toBe('2')
-        expect(atom.config.get('editor.tabLength', {scope: ['source.python']})).toBe(2)
+        expect(soldat.config.get('editor.tabLength', {scope: ['source.python']})).toBe(2)
 
   describe 'grouped settings', ->
     beforeEach ->
@@ -181,8 +181,8 @@ describe "SettingsPanel", ->
           zing:
             type: 'string'
             default: ''
-      atom.config.setSchema('foo', config)
-      expect(_.size(atom.config.get('foo'))).toBe 3
+      soldat.config.setSchema('foo', config)
+      expect(_.size(soldat.config.get('foo'))).toBe 3
       settingsPanel = new SettingsPanel({namespace: 'foo', includeTitle: false})
 
     it 'ensures that only grouped settings have a group title', ->

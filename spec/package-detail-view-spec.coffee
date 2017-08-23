@@ -4,7 +4,7 @@ path = require 'path'
 PackageDetailView = require '../lib/package-detail-view'
 PackageManager = require '../lib/package-manager'
 SettingsView = require '../lib/settings-view'
-AtomIoClient = require '../lib/atom-io-client'
+SoldatTvClient = require '../lib/soldat-tv-client'
 SnippetsProvider =
   getSnippets: -> {}
 
@@ -30,8 +30,8 @@ describe "PackageDetailView", ->
     view.beforeShow(opts)
 
   it "renders a package when provided in `initialize`", ->
-    atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
-    pack = atom.packages.getLoadedPackage('package-with-config')
+    soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
+    pack = soldat.packages.getLoadedPackage('package-with-config')
     view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider)
 
     # Perhaps there are more things to assert here.
@@ -41,7 +41,7 @@ describe "PackageDetailView", ->
     packageManager.client = createClientSpy()
     view = new PackageDetailView({name: 'package-with-config'}, new SettingsView(), packageManager, SnippetsProvider)
 
-    # PackageCard is a subview, and it calls AtomIoClient::package once to load
+    # PackageCard is a subview, and it calls SoldatTvClient::package once to load
     # metadata from the cache.
     expect(packageManager.client.package.callCount).toBe(1)
 
@@ -64,17 +64,17 @@ describe "PackageDetailView", ->
     expect(view.element.querySelectorAll('.package-card').length).toBe(0)
 
   it "shows an error when package metadata cannot be loaded from the cache and the network is unavailable", ->
-    spyOn(AtomIoClient.prototype, 'online').andReturn(false)
-    spyOn(AtomIoClient.prototype, 'request').andCallThrough()
-    spyOn(AtomIoClient.prototype, 'fetchFromCache').andCallFake (path, opts, cb) ->
+    spyOn(SoldatTvClient.prototype, 'online').andReturn(false)
+    spyOn(SoldatTvClient.prototype, 'request').andCallThrough()
+    spyOn(SoldatTvClient.prototype, 'fetchFromCache').andCallFake (path, opts, cb) ->
       # this is the special case which happens when the data is not in the cache
       # and there's no connectivity
       cb(null, {})
 
     view = new PackageDetailView({name: 'some-package'}, new SettingsView(), packageManager, SnippetsProvider)
 
-    expect(AtomIoClient.prototype.fetchFromCache).toHaveBeenCalled()
-    expect(AtomIoClient.prototype.request).not.toHaveBeenCalled()
+    expect(SoldatTvClient.prototype.fetchFromCache).toHaveBeenCalled()
+    expect(SoldatTvClient.prototype.request).not.toHaveBeenCalled()
 
     expect(view.refs.errorMessage.classList.contains('hidden')).not.toBe(true)
     expect(view.refs.loadingMessage.classList.contains('hidden')).toBe(true)
@@ -92,8 +92,8 @@ describe "PackageDetailView", ->
     expect(view.element.querySelectorAll('.package-readme input[type="checkbox"][disabled]').length).toBe(2)
 
   it "renders the README when the package path is undefined", ->
-    atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
-    pack = atom.packages.getLoadedPackage('package-with-readme')
+    soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
+    pack = soldat.packages.getLoadedPackage('package-with-readme')
     delete pack.path
     view = new PackageDetailView(pack, new SettingsView(), packageManager, SnippetsProvider)
 

@@ -7,9 +7,9 @@ PackageManager = require './package-manager'
 packageManager = null
 
 SnippetsProvider =
-  getSnippets: -> atom.config.scopedSettingsStore.propertySets
+  getSnippets: -> soldat.config.scopedSettingsStore.propertySets
 
-configUri = 'atom://config'
+configUri = 'soldat://config'
 uriRegex = /config\/([a-z]+)\/?([a-zA-Z0-9_-]+)?/i
 
 openPanel = (settingsView, panelName, uri) ->
@@ -21,13 +21,13 @@ openPanel = (settingsView, panelName, uri) ->
   if panel is "packages" and detail?
     panelName = detail
     options.pack = name: detail
-    options.back = 'Packages' if atom.packages.getLoadedPackage(detail)
+    options.back = 'Packages' if soldat.packages.getLoadedPackage(detail)
 
   settingsView.showPanel(panelName, options)
 
 module.exports =
   activate: ->
-    atom.workspace.addOpener (uri) =>
+    soldat.workspace.addOpener (uri) =>
       if uri.startsWith(configUri)
         if not settingsView? or settingsView.destroyed
           settingsView = @createSettingsView({uri})
@@ -37,21 +37,21 @@ module.exports =
           openPanel(settingsView, panelName, uri)
         settingsView
 
-    atom.commands.add 'atom-workspace',
-      'settings-view:open': -> atom.workspace.open(configUri)
-      'settings-view:core': -> atom.workspace.open("#{configUri}/core")
-      'settings-view:editor': -> atom.workspace.open("#{configUri}/editor")
-      'settings-view:show-keybindings': -> atom.workspace.open("#{configUri}/keybindings")
-      'settings-view:change-themes': -> atom.workspace.open("#{configUri}/themes")
-      'settings-view:install-packages-and-themes': -> atom.workspace.open("#{configUri}/install")
-      'settings-view:view-installed-themes': -> atom.workspace.open("#{configUri}/themes")
-      'settings-view:uninstall-themes': -> atom.workspace.open("#{configUri}/themes")
-      'settings-view:view-installed-packages': -> atom.workspace.open("#{configUri}/packages")
-      'settings-view:uninstall-packages': -> atom.workspace.open("#{configUri}/packages")
-      'settings-view:check-for-package-updates': -> atom.workspace.open("#{configUri}/updates")
+    soldat.commands.add 'soldat-workspace',
+      'settings-view:open': -> soldat.workspace.open(configUri)
+      'settings-view:core': -> soldat.workspace.open("#{configUri}/core")
+      'settings-view:editor': -> soldat.workspace.open("#{configUri}/editor")
+      'settings-view:show-keybindings': -> soldat.workspace.open("#{configUri}/keybindings")
+      'settings-view:change-themes': -> soldat.workspace.open("#{configUri}/themes")
+      'settings-view:install-packages-and-themes': -> soldat.workspace.open("#{configUri}/install")
+      'settings-view:view-installed-themes': -> soldat.workspace.open("#{configUri}/themes")
+      'settings-view:uninstall-themes': -> soldat.workspace.open("#{configUri}/themes")
+      'settings-view:view-installed-packages': -> soldat.workspace.open("#{configUri}/packages")
+      'settings-view:uninstall-packages': -> soldat.workspace.open("#{configUri}/packages")
+      'settings-view:check-for-package-updates': -> soldat.workspace.open("#{configUri}/updates")
 
-    if process.platform is 'win32' and require('atom').WinShell?
-      atom.commands.add 'atom-workspace', 'settings-view:system': -> atom.workspace.open("#{configUri}/system")
+    if process.platform is 'win32' and require('soldat').WinShell?
+      soldat.commands.add 'soldat-workspace', 'settings-view:system': -> soldat.workspace.open("#{configUri}/system")
 
     unless localStorage.getItem('hasSeenDeprecatedNotification')
       packageManager ?= new PackageManager()
@@ -88,7 +88,7 @@ module.exports =
     localStorage.setItem('hasSeenDeprecatedNotification', true)
 
     deprecatedPackages = packages.user.filter ({name, version}) ->
-      atom.packages.isDeprecatedPackage(name, version)
+      soldat.packages.isDeprecatedPackage(name, version)
     return unless deprecatedPackages.length
 
     were = 'were'
@@ -98,13 +98,13 @@ module.exports =
       packageText = 'package'
       were = 'was'
       have = 'has'
-    notification = atom.notifications.addWarning "#{deprecatedPackages.length} #{packageText} #{have} deprecations and #{were} not loaded.",
+    notification = soldat.notifications.addWarning "#{deprecatedPackages.length} #{packageText} #{have} deprecations and #{were} not loaded.",
       description: 'This message will show only one time. Deprecated packages can be viewed in the settings view.'
       detail: (pack.name for pack in deprecatedPackages).join(', ')
       dismissable: true
       buttons: [{
         text: 'View Deprecated Packages',
         onDidClick: ->
-          atom.commands.dispatch(atom.views.getView(atom.workspace), 'settings-view:view-installed-packages')
+          soldat.commands.dispatch(soldat.views.getView(soldat.workspace), 'settings-view:view-installed-packages')
           notification.dismiss()
       }]

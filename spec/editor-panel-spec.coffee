@@ -27,13 +27,13 @@ describe "EditorPanel", ->
       window.advanceClock(10000) # wait for contents-modified to be triggered
 
   beforeEach ->
-    atom.config.set('editor.boolean', true)
-    atom.config.set('editor.string', 'hey')
-    atom.config.set('editor.object', {boolean: true, int: 3, string: 'test'})
-    atom.config.set('editor.simpleArray', ['a', 'b', 'c'])
-    atom.config.set('editor.complexArray', ['a', 'b', {c: true}])
+    soldat.config.set('editor.boolean', true)
+    soldat.config.set('editor.string', 'hey')
+    soldat.config.set('editor.object', {boolean: true, int: 3, string: 'test'})
+    soldat.config.set('editor.simpleArray', ['a', 'b', 'c'])
+    soldat.config.set('editor.complexArray', ['a', 'b', {c: true}])
 
-    atom.config.setSchema('', type: 'object')
+    soldat.config.setSchema('', type: 'object')
 
     panel = new EditorPanel()
 
@@ -44,11 +44,11 @@ describe "EditorPanel", ->
     expect(getValueForId('editor.object.int')).toBe '3'
     expect(getValueForId('editor.object.string')).toBe 'test'
 
-    atom.config.set('editor.boolean', false)
-    atom.config.set('editor.string', 'hey again')
-    atom.config.set('editor.object.boolean', false)
-    atom.config.set('editor.object.int', 6)
-    atom.config.set('editor.object.string', 'hi')
+    soldat.config.set('editor.boolean', false)
+    soldat.config.set('editor.string', 'hey again')
+    soldat.config.set('editor.object.boolean', false)
+    soldat.config.set('editor.object.int', 6)
+    soldat.config.set('editor.object.string', 'hi')
 
     expect(getValueForId('editor.boolean')).toBeFalsy()
     expect(getValueForId('editor.string')).toBe 'hey again'
@@ -62,23 +62,23 @@ describe "EditorPanel", ->
     setValueForId('editor.object.int', 9)
     setValueForId('editor.object.string', 'yo')
 
-    expect(atom.config.get('editor.boolean')).toBe true
-    expect(atom.config.get('editor.string')).toBe 'oh hi'
-    expect(atom.config.get('editor.object.boolean')).toBe true
-    expect(atom.config.get('editor.object.int')).toBe 9
-    expect(atom.config.get('editor.object.string')).toBe 'yo'
+    expect(soldat.config.get('editor.boolean')).toBe true
+    expect(soldat.config.get('editor.string')).toBe 'oh hi'
+    expect(soldat.config.get('editor.object.boolean')).toBe true
+    expect(soldat.config.get('editor.object.int')).toBe 9
+    expect(soldat.config.get('editor.object.string')).toBe 'yo'
 
     setValueForId('editor.string', '')
     setValueForId('editor.object.int', '')
     setValueForId('editor.object.string', '')
 
-    expect(atom.config.get('editor.string')).toBeUndefined()
-    expect(atom.config.get('editor.object.int')).toBeUndefined()
-    expect(atom.config.get('editor.object.string')).toBeUndefined()
+    expect(soldat.config.get('editor.string')).toBeUndefined()
+    expect(soldat.config.get('editor.object.int')).toBeUndefined()
+    expect(soldat.config.get('editor.object.string')).toBeUndefined()
 
   it "does not save the config value until it has been changed to a new value", ->
     observeHandler = jasmine.createSpy("observeHandler")
-    atom.config.observe "editor.simpleArray", observeHandler
+    soldat.config.observe "editor.simpleArray", observeHandler
     observeHandler.reset()
 
     window.advanceClock(10000) # wait for contents-modified to be triggered
@@ -93,7 +93,7 @@ describe "EditorPanel", ->
 
   it "does not update the editor text unless the value it parses to changes", ->
     setValueForId('editor.simpleArray', "a, b,")
-    expect(atom.config.get('editor.simpleArray')).toEqual ['a', 'b']
+    expect(soldat.config.get('editor.simpleArray')).toEqual ['a', 'b']
     expect(getValueForId('editor.simpleArray')).toBe 'a, b,'
 
   it "only adds editors for arrays when all the values in the array are strings", ->
@@ -102,8 +102,8 @@ describe "EditorPanel", ->
 
     setValueForId('editor.simpleArray', 'a, d')
 
-    expect(atom.config.get('editor.simpleArray')).toEqual ['a', 'd']
-    expect(atom.config.get('editor.complexArray')).toEqual ['a', 'b', {c: true}]
+    expect(soldat.config.get('editor.simpleArray')).toEqual ['a', 'd']
+    expect(soldat.config.get('editor.complexArray')).toEqual ['a', 'b', {c: true}]
 
   it "shows the package settings notes for core and editor settings", ->
     expect(panel.element.querySelector('#editor-settings-note')).toExist()

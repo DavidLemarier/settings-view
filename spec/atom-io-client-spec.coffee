@@ -1,9 +1,9 @@
-AtomIoClient = require '../lib/atom-io-client'
+SoldatTvClient = require '../lib/soldat-tv-client'
 
-describe "AtomIoClient", ->
+describe "SoldatTvClient", ->
 
   beforeEach ->
-    @client = new AtomIoClient
+    @client = new SoldatTvClient
 
   it "fetches avatar from cache if the network is unavailable", ->
     spyOn(@client, 'online').andReturn(false)

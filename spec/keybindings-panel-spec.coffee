@@ -5,34 +5,34 @@ describe "KeybindingsPanel", ->
   [keyBindings, panel] = []
 
   beforeEach ->
-    expect(atom.keymaps).toBeDefined()
+    expect(soldat.keymaps).toBeDefined()
     keyBindings = [
       {
-        source: "#{atom.getLoadSettings().resourcePath}#{path.sep}keymaps"
+        source: "#{soldat.getLoadSettings().resourcePath}#{path.sep}keymaps"
         keystrokes: 'ctrl-a'
         command: 'core:select-all'
         selector: '.editor, .platform-test'
       }
       {
-        source: "#{atom.getLoadSettings().resourcePath}#{path.sep}keymaps"
+        source: "#{soldat.getLoadSettings().resourcePath}#{path.sep}keymaps"
         keystrokes: 'ctrl-u'
         command: 'core:undo'
         selector: ".platform-test"
       }
       {
-        source: "#{atom.getLoadSettings().resourcePath}#{path.sep}keymaps"
+        source: "#{soldat.getLoadSettings().resourcePath}#{path.sep}keymaps"
         keystrokes: 'ctrl-u'
         command: 'core:undo'
         selector: ".platform-a, .platform-b"
       }
       {
-        source: "#{atom.getLoadSettings().resourcePath}#{path.sep}keymaps"
+        source: "#{soldat.getLoadSettings().resourcePath}#{path.sep}keymaps"
         keystrokes: 'shift-\\ \\'
         command: 'core:undo'
         selector: '.editor'
       }
     ]
-    spyOn(atom.keymaps, 'getKeyBindings').andReturn(keyBindings)
+    spyOn(soldat.keymaps, 'getKeyBindings').andReturn(keyBindings)
     panel = new KeybindingsPanel
 
   it "loads and displays core key bindings", ->
@@ -47,18 +47,18 @@ describe "KeybindingsPanel", ->
   describe "when a keybinding is copied", ->
     describe "when the keybinding file ends in .cson", ->
       it "writes a CSON snippet to the clipboard", ->
-        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
+        spyOn(soldat.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
         panel.element.querySelector('.copy-icon').click()
-        expect(atom.clipboard.read()).toBe """
+        expect(soldat.clipboard.read()).toBe """
           '.editor, .platform-test':
             'ctrl-a': 'core:select-all'
         """
 
     describe "when the keybinding file ends in .json", ->
       it "writes a JSON snippet to the clipboard", ->
-        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn 'keymap.json'
+        spyOn(soldat.keymaps, 'getUserKeymapPath').andReturn 'keymap.json'
         panel.element.querySelector('.copy-icon').click()
-        expect(atom.clipboard.read()).toBe """
+        expect(soldat.clipboard.read()).toBe """
           ".editor, .platform-test": {
             "ctrl-a": "core:select-all"
           }
@@ -66,9 +66,9 @@ describe "KeybindingsPanel", ->
 
     describe "when the keybinding contains backslashes", ->
       it "escapes the backslashes before copying", ->
-        spyOn(atom.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
+        spyOn(soldat.keymaps, 'getUserKeymapPath').andReturn 'keymap.cson'
         panel.element.querySelectorAll('.copy-icon')[1].click()
-        expect(atom.clipboard.read()).toBe """
+        expect(soldat.clipboard.read()).toBe """
           '.editor':
             'shift-\\\\ \\\\': 'core:undo'
         """
@@ -76,8 +76,8 @@ describe "KeybindingsPanel", ->
   describe "when the key bindings change", ->
     it "reloads the key bindings", ->
       keyBindings.push
-        source: atom.keymaps.getUserKeymapPath(), keystrokes: 'ctrl-b', command: 'core:undo', selector: '.editor'
-      atom.keymaps.emitter.emit 'did-reload-keymap'
+        source: soldat.keymaps.getUserKeymapPath(), keystrokes: 'ctrl-b', command: 'core:undo', selector: '.editor'
+      soldat.keymaps.emitter.emit 'did-reload-keymap'
 
       waitsFor "the new keybinding to show up in the keybinding panel", ->
         panel.refs.keybindingRows.children.length is 3
@@ -92,8 +92,8 @@ describe "KeybindingsPanel", ->
   describe "when searching key bindings", ->
     it "find case-insensitive results", ->
       keyBindings.push
-        source: "#{atom.getLoadSettings().resourcePath}#{path.sep}keymaps", keystrokes: 'F11', command: 'window:toggle-full-screen', selector: 'body'
-      atom.keymaps.emitter.emit 'did-reload-keymap'
+        source: "#{soldat.getLoadSettings().resourcePath}#{path.sep}keymaps", keystrokes: 'F11', command: 'window:toggle-full-screen', selector: 'body'
+      soldat.keymaps.emitter.emit 'did-reload-keymap'
 
       panel.filterKeyBindings keyBindings, 'f11'
 

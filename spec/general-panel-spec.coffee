@@ -25,12 +25,12 @@ describe "GeneralPanel", ->
       window.advanceClock(10000) # wait for contents-modified to be triggered
 
   beforeEach ->
-    atom.config.set('core.enum', 4)
-    atom.config.set('core.int', 22)
-    atom.config.set('core.float', 0.1)
+    soldat.config.set('core.enum', 4)
+    soldat.config.set('core.int', 22)
+    soldat.config.set('core.float', 0.1)
 
-    atom.config.setSchema('', type: 'object')
-    atom.config.setSchema('core.enum',
+    soldat.config.setSchema('', type: 'object')
+    soldat.config.setSchema('core.enum',
       type: 'integer'
       default: 2
       enum: [2, 4, 6, 8]
@@ -43,9 +43,9 @@ describe "GeneralPanel", ->
     expect(getValueForId('core.int')).toBe '22'
     expect(getValueForId('core.float')).toBe '0.1'
 
-    atom.config.set('core.enum', 6)
-    atom.config.set('core.int', 222)
-    atom.config.set('core.float', 0.11)
+    soldat.config.set('core.enum', 6)
+    soldat.config.set('core.int', 222)
+    soldat.config.set('core.float', 0.11)
 
     expect(getValueForId('core.enum')).toBe '6'
     expect(getValueForId('core.int')).toBe '222'
@@ -55,19 +55,19 @@ describe "GeneralPanel", ->
     setValueForId('core.int', 90)
     setValueForId('core.float', 89.2)
 
-    expect(atom.config.get('core.enum')).toBe 2
-    expect(atom.config.get('core.int')).toBe 90
-    expect(atom.config.get('core.float')).toBe 89.2
+    expect(soldat.config.get('core.enum')).toBe 2
+    expect(soldat.config.get('core.int')).toBe 90
+    expect(soldat.config.get('core.float')).toBe 89.2
 
     setValueForId('core.int', '')
     setValueForId('core.float', '')
 
-    expect(atom.config.get('core.int')).toBeUndefined()
-    expect(atom.config.get('core.float')).toBeUndefined()
+    expect(soldat.config.get('core.int')).toBeUndefined()
+    expect(soldat.config.get('core.float')).toBeUndefined()
 
   it "does not save the config value until it has been changed to a new value", ->
     observeHandler = jasmine.createSpy("observeHandler")
-    atom.config.observe "core.int", observeHandler
+    soldat.config.observe "core.int", observeHandler
     observeHandler.reset()
 
     window.advanceClock(10000) # wait for contents-modified to be triggered
@@ -82,7 +82,7 @@ describe "GeneralPanel", ->
 
   it "does not update the editor text unless the value it parses to changes", ->
     setValueForId('core.int', "2.")
-    expect(atom.config.get('core.int')).toBe 2
+    expect(soldat.config.get('core.int')).toBe 2
     expect(getValueForId('core.int')).toBe '2.'
 
   it "shows the package settings notes for core and editor settings", ->

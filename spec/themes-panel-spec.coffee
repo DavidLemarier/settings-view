@@ -11,15 +11,15 @@ describe "ThemesPanel", ->
   settingsView = null
 
   beforeEach ->
-    atom.packages.loadPackage('atom-light-ui')
-    atom.packages.loadPackage('atom-dark-ui')
-    atom.packages.loadPackage('atom-light-syntax')
-    atom.packages.loadPackage('atom-dark-syntax')
-    atom.packages.packageDirPaths.push(path.join(__dirname, 'fixtures'))
-    atom.config.set('core.themes', ['atom-dark-ui', 'atom-dark-syntax'])
+    soldat.packages.loadPackage('soldat-light-ui')
+    soldat.packages.loadPackage('soldat-dark-ui')
+    soldat.packages.loadPackage('soldat-light-syntax')
+    soldat.packages.loadPackage('soldat-dark-syntax')
+    soldat.packages.packageDirPaths.push(path.join(__dirname, 'fixtures'))
+    soldat.config.set('core.themes', ['soldat-dark-ui', 'soldat-dark-syntax'])
     reloadedHandler = jasmine.createSpy('reloadedHandler')
-    atom.themes.onDidChangeActiveThemes(reloadedHandler)
-    atom.themes.activatePackages()
+    soldat.themes.onDidChangeActiveThemes(reloadedHandler)
+    soldat.themes.activatePackages()
 
     waitsFor "themes to be reloaded", ->
       reloadedHandler.callCount is 1
@@ -35,38 +35,38 @@ describe "ThemesPanel", ->
       spyOn(panel, 'scheduleUpdateThemeConfig').andCallFake -> @updateThemeConfig()
 
   afterEach ->
-    atom.packages.unloadPackage('a-theme') if atom.packages.isPackageLoaded('a-theme')
-    atom.themes.deactivateThemes()
+    soldat.packages.unloadPackage('a-theme') if soldat.packages.isPackageLoaded('a-theme')
+    soldat.themes.deactivateThemes()
 
   it "selects the active syntax and UI themes", ->
-    expect(panel.refs.uiMenu.value).toBe 'atom-dark-ui'
-    expect(panel.refs.syntaxMenu.value).toBe 'atom-dark-syntax'
+    expect(panel.refs.uiMenu.value).toBe 'soldat-dark-ui'
+    expect(panel.refs.syntaxMenu.value).toBe 'soldat-dark-syntax'
 
   describe "when a UI theme is selected", ->
     it "updates the 'core.themes' config key with the selected UI theme", ->
       for child in panel.refs.uiMenu.children
-        child.selected = child.value is 'atom-light-ui'
+        child.selected = child.value is 'soldat-light-ui'
         child.dispatchEvent(new Event('change', {bubbles: true}))
-      expect(atom.config.get('core.themes')).toEqual ['atom-light-ui', 'atom-dark-syntax']
+      expect(soldat.config.get('core.themes')).toEqual ['soldat-light-ui', 'soldat-dark-syntax']
 
   describe "when a syntax theme is selected", ->
     it "updates the 'core.themes' config key with the selected syntax theme", ->
       for child in panel.refs.syntaxMenu.children
-        child.selected = child.value is 'atom-light-syntax'
+        child.selected = child.value is 'soldat-light-syntax'
         child.dispatchEvent(new Event('change', {bubbles: true}))
-      expect(atom.config.get('core.themes')).toEqual ['atom-dark-ui', 'atom-light-syntax']
+      expect(soldat.config.get('core.themes')).toEqual ['soldat-dark-ui', 'soldat-light-syntax']
 
   describe "when the 'core.config' key changes", ->
     it "refreshes the theme menus", ->
       reloadedHandler.reset()
-      atom.config.set('core.themes', ['atom-light-ui', 'atom-light-syntax'])
+      soldat.config.set('core.themes', ['soldat-light-ui', 'soldat-light-syntax'])
 
       waitsFor ->
         reloadedHandler.callCount is 1
 
       runs ->
-        expect(panel.refs.uiMenu.value).toBe 'atom-light-ui'
-        expect(panel.refs.syntaxMenu.value).toBe 'atom-light-syntax'
+        expect(panel.refs.uiMenu.value).toBe 'soldat-light-ui'
+        expect(panel.refs.syntaxMenu.value).toBe 'soldat-light-syntax'
 
   xdescribe "when the themes panel is navigated to", ->
     xit "focuses the search filter", ->
@@ -111,7 +111,7 @@ describe "ThemesPanel", ->
       spyOn(packageManager, 'runCommand').andCallFake (args, callback) ->
         installCallback = callback
         onWillThrowError: ->
-      spyOn(atom.packages, 'loadPackage').andCallFake (name) ->
+      spyOn(soldat.packages, 'loadPackage').andCallFake (name) ->
         installed.user.push {name, theme: 'ui'}
 
       expect(panel.refs.communityCount.textContent.trim()).toBe '1'
@@ -175,7 +175,7 @@ describe "ThemesPanel", ->
         packageManager.getInstalled.callCount is 1 and panel.refs.communityCount.textContent.indexOf('…') < 0
 
     afterEach ->
-      atom.themes.deactivateThemes()
+      soldat.themes.deactivateThemes()
 
     it 'has a count of zero in all headings', ->
       for heading in panel.element.querySelector('.section-heading-count')

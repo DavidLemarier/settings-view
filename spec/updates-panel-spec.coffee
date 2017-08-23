@@ -75,7 +75,7 @@ describe 'UpdatesPanel', ->
       spyOn(cardC, 'update').andReturn(new Promise((resolve, reject) -> [resolveC, rejectC] = [resolve, reject]))
 
     it 'attempts to update all packages and prompts to restart if at least one package updates successfully', ->
-      expect(atom.notifications.getNotifications().length).toBe 0
+      expect(soldat.notifications.getNotifications().length).toBe 0
       expect(panel.refs.updateAllButton).toBeVisible()
 
       panel.updateAll()
@@ -85,18 +85,18 @@ describe 'UpdatesPanel', ->
 
       waits 0
       runs ->
-        expect(atom.notifications.getNotifications().length).toBe 0
+        expect(soldat.notifications.getNotifications().length).toBe 0
 
         resolveC()
 
       waits 0
       runs ->
-        notifications = atom.notifications.getNotifications()
+        notifications = soldat.notifications.getNotifications()
         expect(notifications.length).toBe 1
 
-        spyOn(atom, 'restartApplication')
+        spyOn(soldat, 'restartApplication')
         notifications[0].options.buttons[0].onDidClick()
-        expect(atom.restartApplication).toHaveBeenCalled()
+        expect(soldat.restartApplication).toHaveBeenCalled()
 
     it 'becomes hidden if all updates succeed', ->
       expect(panel.refs.updateAllButton.disabled).toBe false

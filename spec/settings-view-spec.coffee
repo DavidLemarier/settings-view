@@ -120,15 +120,15 @@ describe "SettingsView", ->
   describe "when the package is activated", ->
     openWithCommand = (command) ->
       waitsFor (done) ->
-        openSubscription = atom.workspace.onDidOpen ->
+        openSubscription = soldat.workspace.onDidOpen ->
           openSubscription.dispose()
           done()
-        atom.commands.dispatch(atom.views.getView(atom.workspace), command)
+        soldat.commands.dispatch(soldat.views.getView(soldat.workspace), command)
 
     beforeEach ->
-      jasmine.attachToDOM(atom.views.getView(atom.workspace))
+      jasmine.attachToDOM(soldat.views.getView(soldat.workspace))
       waitsForPromise ->
-        atom.packages.activatePackage('settings-view')
+        soldat.packages.activatePackage('settings-view')
 
     describe "when the settings view is opened with a settings-view:* command", ->
       beforeEach ->
@@ -138,7 +138,7 @@ describe "SettingsView", ->
         it "opens the settings view", ->
           openWithCommand('settings-view:open')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
+            expect(soldat.workspace.getActivePaneItem().activePanel)
               .toEqual name: 'Core', options: {}
 
       describe "settings-view:core", ->
@@ -147,59 +147,59 @@ describe "SettingsView", ->
           runs ->
             openWithCommand('settings-view:core')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Core', options: uri: 'atom://config/core'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Core', options: uri: 'soldat://config/core'
 
       describe "settings-view:editor", ->
         it "opens the editor settings view", ->
           openWithCommand('settings-view:editor')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Editor', options: uri: 'atom://config/editor'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Editor', options: uri: 'soldat://config/editor'
 
       describe "settings-view:show-keybindings", ->
         it "opens the settings view to the keybindings page", ->
           openWithCommand('settings-view:show-keybindings')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Keybindings', options: uri: 'atom://config/keybindings'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Keybindings', options: uri: 'soldat://config/keybindings'
 
       describe "settings-view:change-themes", ->
         it "opens the settings view to the themes page", ->
           openWithCommand('settings-view:change-themes')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Themes', options: uri: 'atom://config/themes'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Themes', options: uri: 'soldat://config/themes'
 
       describe "settings-view:uninstall-themes", ->
         it "opens the settings view to the themes page", ->
           openWithCommand('settings-view:uninstall-themes')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Themes', options: uri: 'atom://config/themes'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Themes', options: uri: 'soldat://config/themes'
 
       describe "settings-view:uninstall-packages", ->
         it "opens the settings view to the install page", ->
           openWithCommand('settings-view:uninstall-packages')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Packages', options: uri: 'atom://config/packages'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Packages', options: uri: 'soldat://config/packages'
 
       describe "settings-view:install-packages-and-themes", ->
         it "opens the settings view to the install page", ->
           openWithCommand('settings-view:install-packages-and-themes')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Install', options: uri: 'atom://config/install'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Install', options: uri: 'soldat://config/install'
 
       describe "settings-view:check-for-package-updates", ->
         it "opens the settings view to the install page", ->
           openWithCommand('settings-view:check-for-package-updates')
           runs ->
-            expect(atom.workspace.getActivePaneItem().activePanel)
-              .toEqual name: 'Updates', options: uri: 'atom://config/updates'
+            expect(soldat.workspace.getActivePaneItem().activePanel)
+              .toEqual name: 'Updates', options: uri: 'soldat://config/updates'
 
-    describe "when atom.workspace.open() is used with a config URI", ->
+    describe "when soldat.workspace.open() is used with a config URI", ->
       focusIsWithinActivePanel = ->
         activePanel = settingsView.panelsByName[settingsView.activePanel.name]
         activePanel.element is document.activeElement or activePanel.element.contains(document.activeElement)
@@ -207,18 +207,18 @@ describe "SettingsView", ->
       expectActivePanelToBeKeyboardScrollable = ->
         activePanel = settingsView.panelsByName[settingsView.activePanel.name]
         spyOn(activePanel, 'pageDown')
-        atom.commands.dispatch(activePanel.element, 'core:page-down')
+        soldat.commands.dispatch(activePanel.element, 'core:page-down')
         expect(activePanel.pageDown).toHaveBeenCalled()
         spyOn(activePanel, 'pageUp')
-        atom.commands.dispatch(activePanel.element, 'core:page-up')
+        soldat.commands.dispatch(activePanel.element, 'core:page-up')
         expect(activePanel.pageUp).toHaveBeenCalled()
 
       beforeEach ->
         settingsView = null
 
-      it "opens the settings to the correct panel with atom://config/<panel-name> and that panel is keyboard-scrollable", ->
+      it "opens the settings to the correct panel with soldat://config/<panel-name> and that panel is keyboard-scrollable", ->
         waitsForPromise ->
-          atom.workspace.open('atom://config').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config').then (s) -> settingsView = s
 
         waitsFor (done) -> process.nextTick(done)
         runs ->
@@ -228,90 +228,90 @@ describe "SettingsView", ->
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/editor').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/editor').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Editor', options: uri: 'atom://config/editor'
+            .toEqual name: 'Editor', options: uri: 'soldat://config/editor'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/keybindings').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/keybindings').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Keybindings', options: uri: 'atom://config/keybindings'
+            .toEqual name: 'Keybindings', options: uri: 'soldat://config/keybindings'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/packages').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/packages').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Packages', options: uri: 'atom://config/packages'
+            .toEqual name: 'Packages', options: uri: 'soldat://config/packages'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/themes').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/themes').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Themes', options: uri: 'atom://config/themes'
+            .toEqual name: 'Themes', options: uri: 'soldat://config/themes'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/updates').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/updates').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Updates', options: uri: 'atom://config/updates'
+            .toEqual name: 'Updates', options: uri: 'soldat://config/updates'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/install').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/install').then (s) -> settingsView = s
 
         hasSystemPanel = false
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Install', options: uri: 'atom://config/install'
+            .toEqual name: 'Install', options: uri: 'soldat://config/install'
           expect(focusIsWithinActivePanel()).toBe true
           expectActivePanelToBeKeyboardScrollable()
           hasSystemPanel = settingsView.panelsByName['System']?
 
         if hasSystemPanel
           waitsForPromise ->
-            atom.workspace.open('atom://config/system').then (s) -> settingsView = s
+            soldat.workspace.open('soldat://config/system').then (s) -> settingsView = s
 
           waits 1
           runs ->
             expect(settingsView.activePanel)
-              .toEqual name: 'System', options: uri: 'atom://config/system'
+              .toEqual name: 'System', options: uri: 'soldat://config/system'
             expect(focusIsWithinActivePanel()).toBe true
             expectActivePanelToBeKeyboardScrollable()
 
-      it "opens the package settings view with atom://config/packages/<package-name>", ->
+      it "opens the package settings view with soldat://config/packages/<package-name>", ->
         waitsForPromise ->
-          atom.packages.activatePackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
+          soldat.packages.activatePackage(path.join(__dirname, 'fixtures', 'package-with-readme'))
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/packages/package-with-readme').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/packages/package-with-readme').then (s) -> settingsView = s
 
         waitsFor (done) -> process.nextTick(done)
         runs ->
           expect(settingsView.activePanel)
             .toEqual name: 'package-with-readme', options: {
-              uri: 'atom://config/packages/package-with-readme',
+              uri: 'soldat://config/packages/package-with-readme',
               pack:
                 name: 'package-with-readme'
                 metadata:
@@ -324,7 +324,7 @@ describe "SettingsView", ->
         spyOn(InstallPanel::, 'beforeShow')
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/install/package:something').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/install/package:something').then (s) -> settingsView = s
 
         waitsFor ->
           settingsView.activePanel?
@@ -332,15 +332,15 @@ describe "SettingsView", ->
 
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Install', options: uri: 'atom://config/install/package:something'
-          expect(InstallPanel::beforeShow).toHaveBeenCalledWith {uri: 'atom://config/install/package:something'}
+            .toEqual name: 'Install', options: uri: 'soldat://config/install/package:something'
+          expect(InstallPanel::beforeShow).toHaveBeenCalledWith {uri: 'soldat://config/install/package:something'}
 
       it "passes the URI to a pane's beforeShow() method after initialization", ->
         InstallPanel = require '../lib/install-panel'
         spyOn(InstallPanel::, 'beforeShow')
 
         waitsForPromise ->
-          atom.workspace.open('atom://config').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config').then (s) -> settingsView = s
 
         waitsFor (done) -> process.nextTick(done)
 
@@ -348,13 +348,13 @@ describe "SettingsView", ->
           expect(settingsView.activePanel).toEqual {name: 'Core', options: {}}
 
         waitsForPromise ->
-          atom.workspace.open('atom://config/install/package:something').then (s) -> settingsView = s
+          soldat.workspace.open('soldat://config/install/package:something').then (s) -> settingsView = s
 
         waits 1
         runs ->
           expect(settingsView.activePanel)
-            .toEqual name: 'Install', options: uri: 'atom://config/install/package:something'
-          expect(InstallPanel::beforeShow).toHaveBeenCalledWith {uri: 'atom://config/install/package:something'}
+            .toEqual name: 'Install', options: uri: 'soldat://config/install/package:something'
+          expect(InstallPanel::beforeShow).toHaveBeenCalledWith {uri: 'soldat://config/install/package:something'}
 
     describe "when the package is then deactivated", ->
       beforeEach ->
@@ -366,7 +366,7 @@ describe "SettingsView", ->
         waitsFor (done) -> process.nextTick(done)
 
         runs ->
-          settingsView = atom.workspace.getActivePaneItem()
+          settingsView = soldat.workspace.getActivePaneItem()
           panels = [
             settingsView.getOrCreatePanel('Core')
             settingsView.getOrCreatePanel('Editor')
@@ -385,7 +385,7 @@ describe "SettingsView", ->
             else
               spyOn(panel, 'destroy')
 
-          atom.packages.deactivatePackage('settings-view')
+          soldat.packages.deactivatePackage('settings-view')
 
           for panel in panels
             if panel.dispose
@@ -398,7 +398,7 @@ describe "SettingsView", ->
   describe "when an installed package is clicked from the Install panel", ->
     it "displays the package details", ->
       waitsFor ->
-        atom.packages.activatePackage('settings-view')
+        soldat.packages.activatePackage('settings-view')
 
       runs ->
         settingsView.packageManager.getClient()
@@ -419,14 +419,14 @@ describe "SettingsView", ->
     panel = null
 
     beforeEach ->
-      atom.packages.packageDirPaths.push(path.join(__dirname, 'fixtures'))
-      atom.packages.loadPackage('ui-theme-with-config')
-      atom.packages.loadPackage('syntax-theme-with-config')
-      atom.config.set('core.themes', ['ui-theme-with-config', 'syntax-theme-with-config'])
+      soldat.packages.packageDirPaths.push(path.join(__dirname, 'fixtures'))
+      soldat.packages.loadPackage('ui-theme-with-config')
+      soldat.packages.loadPackage('syntax-theme-with-config')
+      soldat.config.set('core.themes', ['ui-theme-with-config', 'syntax-theme-with-config'])
 
       reloadedHandler = jasmine.createSpy('reloadedHandler')
-      atom.themes.onDidChangeActiveThemes(reloadedHandler)
-      atom.themes.activatePackages()
+      soldat.themes.onDidChangeActiveThemes(reloadedHandler)
+      soldat.themes.activatePackages()
 
       waitsFor "themes to be reloaded", ->
         reloadedHandler.callCount is 1
@@ -436,7 +436,7 @@ describe "SettingsView", ->
         panel = settingsView.element.querySelector('.themes-panel')
 
     afterEach ->
-      atom.themes.unwatchUserStylesheet()
+      soldat.themes.unwatchUserStylesheet()
 
     describe "when the UI theme's settings button is clicked", ->
       it "navigates to that theme's detail view", ->

@@ -6,7 +6,7 @@ glob = require 'glob'
 request = require 'request'
 
 module.exports =
-class AtomIoClient
+class SoldatTvClient
   constructor: (@packageManager, @baseURL) ->
     @baseURL ?= 'https://atom.io/api/'
     # 12 hour expiry

@@ -104,14 +104,14 @@ describe "PackageCard", ->
       card.refs.installButton.click()
       expect(packageManager.install).toHaveBeenCalled()
 
-    it "can be installed if currently not installed and package latest release engine match atom version", ->
+    it "can be installed if currently not installed and package latest release engine match soldat version", ->
       spyOn(packageManager, 'install')
       spyOn(packageManager, 'loadCompatiblePackageVersion').andCallFake (packageName, callback) ->
         pack =
           name: packageName
           version: '0.1.0'
           engines:
-            atom: '>0.50.0'
+            soldat: '>0.50.0'
 
         callback(null, pack)
 
@@ -121,7 +121,7 @@ describe "PackageCard", ->
         name: 'test-package'
         version: '0.1.0'
         engines:
-          atom: '>0.50.0'
+          soldat: '>0.50.0'
       }, new SettingsView(), packageManager
 
       # In that case there's no need to make a request to get all the versions
@@ -135,17 +135,17 @@ describe "PackageCard", ->
         name: 'test-package'
         version: '0.1.0'
         engines:
-          atom: '>0.50.0'
+          soldat: '>0.50.0'
       })
 
-    it "can be installed with a previous version whose engine match the current atom version", ->
+    it "can be installed with a previous version whose engine match the current soldat version", ->
       spyOn(packageManager, 'install')
       spyOn(packageManager, 'loadCompatiblePackageVersion').andCallFake (packageName, callback) ->
         pack =
           name: packageName
           version: '0.0.1'
           engines:
-            atom: '>0.50.0'
+            soldat: '>0.50.0'
 
         callback(null, pack)
 
@@ -155,7 +155,7 @@ describe "PackageCard", ->
         name: 'test-package'
         version: '0.1.0'
         engines:
-          atom: '>99.0.0'
+          soldat: '>99.0.0'
       }, new SettingsView(), packageManager
 
       expect(card.refs.installButton.style.display).not.toBe('none')
@@ -169,10 +169,10 @@ describe "PackageCard", ->
         name: 'test-package'
         version: '0.0.1'
         engines:
-          atom: '>0.50.0'
+          soldat: '>0.50.0'
       })
 
-    it "can't be installed if there is no version compatible with the current atom version", ->
+    it "can't be installed if there is no version compatible with the current soldat version", ->
       spyOn(packageManager, 'loadCompatiblePackageVersion').andCallFake (packageName, callback) ->
         pack =
           name: packageName
@@ -184,7 +184,7 @@ describe "PackageCard", ->
       pack =
         name: 'test-package'
         engines:
-          atom: '>=99.0.0'
+          soldat: '>=99.0.0'
       card = new PackageCard(pack , new SettingsView(), packageManager)
       jasmine.attachToDOM(card.element)
 
@@ -195,21 +195,21 @@ describe "PackageCard", ->
 
   describe "when the package is installed", ->
     beforeEach ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
       waitsFor ->
-        atom.packages.isPackageLoaded('package-with-config') is true
+        soldat.packages.isPackageLoaded('package-with-config') is true
 
     it "can be disabled if installed", ->
       setPackageStatusSpies {installed: true, disabled: false}
-      spyOn(atom.packages, 'disablePackage').andReturn(true)
+      spyOn(soldat.packages, 'disablePackage').andReturn(true)
 
       card = new PackageCard {name: 'test-package'}, new SettingsView(), packageManager
       expect(card.refs.enablementButton.querySelector('.disable-text').textContent).toBe('Disable')
       card.refs.enablementButton.click()
-      expect(atom.packages.disablePackage).toHaveBeenCalled()
+      expect(soldat.packages.disablePackage).toHaveBeenCalled()
 
     it "can be updated", ->
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       pack.latestVersion = '1.1.0'
       packageUpdated = false
 
@@ -218,9 +218,9 @@ describe "PackageCard", ->
         callback(0, '', '')
         onWillThrowError: ->
 
-      originalLoadPackage = atom.packages.loadPackage
-      spyOn(atom.packages, 'loadPackage').andCallFake ->
-        originalLoadPackage.call(atom.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
+      originalLoadPackage = soldat.packages.loadPackage
+      spyOn(soldat.packages, 'loadPackage').andCallFake ->
+        originalLoadPackage.call(soldat.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
 
       card = new PackageCard(pack, new SettingsView(), packageManager)
       jasmine.attachToDOM(card.element)
@@ -235,7 +235,7 @@ describe "PackageCard", ->
         expect(card.refs.updateButton).not.toBeVisible()
 
     it 'keeps the update button visible if the update failed', ->
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       pack.latestVersion = '1.1.0'
       updateFailed = false
 
@@ -244,9 +244,9 @@ describe "PackageCard", ->
         callback(1, '', '')
         onWillThrowError: ->
 
-      originalLoadPackage = atom.packages.loadPackage
-      spyOn(atom.packages, 'loadPackage').andCallFake ->
-        originalLoadPackage.call(atom.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
+      originalLoadPackage = soldat.packages.loadPackage
+      spyOn(soldat.packages, 'loadPackage').andCallFake ->
+        originalLoadPackage.call(soldat.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
 
       card = new PackageCard(pack, new SettingsView(), packageManager)
       jasmine.attachToDOM(card.element)
@@ -261,7 +261,7 @@ describe "PackageCard", ->
         expect(card.refs.updateButton).toBeVisible()
 
     it "will stay disabled after an update", ->
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       pack.latestVersion = '1.1.0'
       packageUpdated = false
 
@@ -270,20 +270,20 @@ describe "PackageCard", ->
         callback(0, '', '')
         onWillThrowError: ->
 
-      originalLoadPackage = atom.packages.loadPackage
-      spyOn(atom.packages, 'loadPackage').andCallFake ->
-        originalLoadPackage.call(atom.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
+      originalLoadPackage = soldat.packages.loadPackage
+      spyOn(soldat.packages, 'loadPackage').andCallFake ->
+        originalLoadPackage.call(soldat.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
 
       pack.disable()
       card = new PackageCard(pack, new SettingsView(), packageManager)
-      expect(atom.packages.isPackageDisabled('package-with-config')).toBe true
+      expect(soldat.packages.isPackageDisabled('package-with-config')).toBe true
       card.update()
 
       waitsFor ->
         packageUpdated
 
       runs ->
-        expect(atom.packages.isPackageDisabled('package-with-config')).toBe true
+        expect(soldat.packages.isPackageDisabled('package-with-config')).toBe true
 
     it "is uninstalled when the uninstallButton is clicked", ->
       setPackageStatusSpies {installed: true, disabled: false}
@@ -297,7 +297,7 @@ describe "PackageCard", ->
       spyOn(packageManager, 'install').andCallThrough()
       spyOn(packageManager, 'uninstall').andCallThrough()
 
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       card = new PackageCard(pack, new SettingsView(), packageManager)
       jasmine.attachToDOM(card.element)
 
@@ -326,9 +326,9 @@ describe "PackageCard", ->
         expect(card.refs.installAlternativeButtonGroup).not.toBeVisible()
 
     it "shows the settings, uninstall, and enable buttons when disabled", ->
-      atom.config.set('package-with-config.setting', 'something')
-      pack = atom.packages.getLoadedPackage('package-with-config')
-      spyOn(atom.packages, 'isPackageDisabled').andReturn(true)
+      soldat.config.set('package-with-config.setting', 'something')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
+      spyOn(soldat.packages, 'isPackageDisabled').andReturn(true)
       card = new PackageCard(pack, new SettingsView(), packageManager)
       jasmine.attachToDOM(card.element)
 
@@ -342,8 +342,8 @@ describe "PackageCard", ->
       expect(card.refs.enablementButton.textContent).toBe 'Enable'
 
     it "shows the settings, uninstall, and disable buttons", ->
-      atom.config.set('package-with-config.setting', 'something')
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      soldat.config.set('package-with-config.setting', 'something')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       spyOn(PackageCard::, 'isDeprecated').andReturn(false)
       card = new PackageCard(pack, new SettingsView(), packageManager)
 
@@ -359,7 +359,7 @@ describe "PackageCard", ->
       expect(card.refs.enablementButton.textContent).toBe 'Disable'
 
     it "does not show the settings button when there are no settings", ->
-      pack = atom.packages.getLoadedPackage('package-with-config')
+      pack = soldat.packages.getLoadedPackage('package-with-config')
       spyOn(PackageCard::, 'isDeprecated').andReturn(false)
       spyOn(PackageCard::, 'hasSettings').andReturn(false)
       card = new PackageCard(pack, new SettingsView(), packageManager)
@@ -380,13 +380,13 @@ describe "PackageCard", ->
   ###
   describe "when the package has deprecations", ->
     beforeEach ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
 
       waitsFor ->
-        atom.packages.isPackageLoaded('package-with-config') is true
+        soldat.packages.isPackageLoaded('package-with-config') is true
 
       runs ->
-        atom.config.set('package-with-config.setting', 'something')
+        soldat.config.set('package-with-config.setting', 'something')
 
     describe "when hasDeprecations is true and NO update is available", ->
       beforeEach ->
@@ -395,13 +395,13 @@ describe "PackageCard", ->
         spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
           hasDeprecations: true
           version: '<=1.0.0'
-        pack = atom.packages.getLoadedPackage('package-with-config')
+        pack = soldat.packages.getLoadedPackage('package-with-config')
         pack.version = pack.metadata.version
         card = new PackageCard(pack, new SettingsView(), packageManager)
         jasmine.attachToDOM(card.element)
 
       it "shows the correct state", ->
-        spyOn(atom.packages, 'isPackageDisabled').andReturn false
+        spyOn(soldat.packages, 'isPackageDisabled').andReturn false
         card.updateInterfaceState()
         expect(card.refs.updateButtonGroup).not.toBeVisible()
         expect(card.refs.installButtonGroup).not.toBeVisible()
@@ -417,7 +417,7 @@ describe "PackageCard", ->
         expect(card.refs.enablementButton.disabled).toBe false
 
       it "displays a disabled enable button when the package is disabled", ->
-        spyOn(atom.packages, 'isPackageDisabled').andReturn true
+        spyOn(soldat.packages, 'isPackageDisabled').andReturn true
         card.updateInterfaceState()
         expect(card.refs.updateButtonGroup).not.toBeVisible()
         expect(card.refs.installButtonGroup).not.toBeVisible()
@@ -442,7 +442,7 @@ describe "PackageCard", ->
         spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
           hasDeprecations: true
           version: '<=1.0.1'
-        pack = atom.packages.getLoadedPackage('package-with-config')
+        pack = soldat.packages.getLoadedPackage('package-with-config')
         pack.version = pack.metadata.version
         card = new PackageCard(pack, new SettingsView(), packageManager)
         jasmine.attachToDOM(card.element)
@@ -467,7 +467,7 @@ describe "PackageCard", ->
           expect(card.refs.enablementButton.textContent).toBe 'Disable'
 
         it "updates the package and shows a restart notification when the update button is clicked", ->
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
+          expect(soldat.packages.getLoadedPackage('package-with-config')).toBeTruthy()
 
           [updateCallback] = []
           packageManager.runCommand.andCallFake (args, callback) ->
@@ -475,16 +475,16 @@ describe "PackageCard", ->
             onWillThrowError: ->
           spyOn(packageManager, 'update').andCallThrough()
 
-          originalLoadPackage = atom.packages.loadPackage
-          spyOn(atom.packages, 'loadPackage').andCallFake ->
-            pack = originalLoadPackage.call(atom.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
+          originalLoadPackage = soldat.packages.loadPackage
+          spyOn(soldat.packages, 'loadPackage').andCallFake ->
+            pack = originalLoadPackage.call(soldat.packages, path.join(__dirname, 'fixtures', 'package-with-config'))
             pack.metadata.version = '1.1.0' if pack?
             pack
 
           card.displayAvailableUpdate('1.1.0')
           expect(card.refs.updateButtonGroup).toBeVisible()
 
-          expect(atom.packages.getLoadedPackage('package-with-config')).toBeTruthy()
+          expect(soldat.packages.getLoadedPackage('package-with-config')).toBeTruthy()
           card.refs.updateButton.click()
 
           expect(card.refs.updateButton.disabled).toBe true
@@ -512,23 +512,23 @@ describe "PackageCard", ->
             expect(card.refs.installAlternativeButtonGroup).not.toBeVisible()
             expect(card.refs.versionValue.textContent).toBe '1.0.0' # Does not update until restart
 
-            notifications = atom.notifications.getNotifications()
+            notifications = soldat.notifications.getNotifications()
             expect(notifications.length).toBe 1
 
-            spyOn(atom, 'restartApplication')
+            spyOn(soldat, 'restartApplication')
             notifications[0].options.buttons[0].onDidClick()
-            expect(atom.restartApplication).toHaveBeenCalled()
+            expect(soldat.restartApplication).toHaveBeenCalled()
 
     describe "when hasAlternative is true and alternative is core", ->
       beforeEach ->
-        spyOn(atom.packages, 'isDeprecatedPackage').andReturn true
-        spyOn(atom.packages, 'isPackageLoaded').andReturn false
-        spyOn(atom.packages, 'isPackageDisabled').andReturn false
-        spyOn(atom.packages, 'getAvailablePackageNames').andReturn(['package-with-config'])
+        spyOn(soldat.packages, 'isDeprecatedPackage').andReturn true
+        spyOn(soldat.packages, 'isPackageLoaded').andReturn false
+        spyOn(soldat.packages, 'isPackageDisabled').andReturn false
+        spyOn(soldat.packages, 'getAvailablePackageNames').andReturn(['package-with-config'])
         spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
           hasAlternative: true
           alternative: 'core'
-        pack = atom.packages.getLoadedPackage('package-with-config')
+        pack = soldat.packages.getLoadedPackage('package-with-config')
         card = new PackageCard(pack, new SettingsView(), packageManager)
         jasmine.attachToDOM(card.element)
 
@@ -550,7 +550,7 @@ describe "PackageCard", ->
         spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
           hasAlternative: true
           alternative: 'not-installed-package'
-        pack = atom.packages.getLoadedPackage('package-with-config')
+        pack = soldat.packages.getLoadedPackage('package-with-config')
         card = new PackageCard(pack, new SettingsView(), packageManager)
         jasmine.attachToDOM(card.element)
 
@@ -579,7 +579,7 @@ describe "PackageCard", ->
 
         spyOn(packageManager, 'install').andCallThrough()
         spyOn(packageManager, 'uninstall').andCallThrough()
-        spyOn(atom.packages, 'activatePackage')
+        spyOn(soldat.packages, 'activatePackage')
 
         card.refs.installAlternativeButton.click()
 
@@ -611,16 +611,16 @@ describe "PackageCard", ->
 
     describe "when hasAlternative is true and alternative is an installed package", ->
       beforeEach ->
-        atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'language-test'))
+        soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'language-test'))
         waitsFor ->
-          atom.packages.isPackageLoaded('language-test') is true
+          soldat.packages.isPackageLoaded('language-test') is true
 
         runs ->
           spyOn(PackageCard::, 'isDeprecated').andReturn true
           spyOn(PackageCard::, 'getDeprecatedPackageMetadata').andReturn
             hasAlternative: true
             alternative: 'language-test'
-          pack = atom.packages.getLoadedPackage('package-with-config')
+          pack = soldat.packages.getLoadedPackage('package-with-config')
           card = new PackageCard(pack, new SettingsView(), packageManager)
           jasmine.attachToDOM(card.element)
 

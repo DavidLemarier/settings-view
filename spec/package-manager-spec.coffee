@@ -6,7 +6,7 @@ describe "PackageManager", ->
   [packageManager] = []
 
   beforeEach ->
-    spyOn(atom.packages, 'getApmPath').andReturn('/an/invalid/apm/command/to/run')
+    spyOn(soldat.packages, 'getApmPath').andReturn('/an/invalid/apm/command/to/run')
     packageManager = new PackageManager()
 
   it "handle errors spawning apm", ->
@@ -59,11 +59,11 @@ describe "PackageManager", ->
       expect(packageManager.isPackageInstalled('some-package')).toBe false
 
     it "returns true when a package is loaded", ->
-      spyOn(atom.packages, 'isPackageLoaded').andReturn true
+      spyOn(soldat.packages, 'isPackageLoaded').andReturn true
       expect(packageManager.isPackageInstalled('some-package')).toBe true
 
     it "returns true when a package is disabled", ->
-      spyOn(atom.packages, 'getAvailablePackageNames').andReturn ['some-package']
+      spyOn(soldat.packages, 'getAvailablePackageNames').andReturn ['some-package']
       expect(packageManager.isPackageInstalled('some-package')).toBe true
 
   describe "::install()", ->
@@ -105,13 +105,13 @@ describe "PackageManager", ->
         expect(runArgs).toEqual ['install', 'user/repo', '--json']
 
       it 'installs and activates git pacakges with names different from the repo name', ->
-        spyOn(atom.packages, 'activatePackage')
+        spyOn(soldat.packages, 'activatePackage')
         packageManager.install(name: 'git-repo-name')
         json =
           metadata:
             name: 'real-package-name'
         runCallback(0, JSON.stringify([json]), '')
-        expect(atom.packages.activatePackage).toHaveBeenCalledWith json.metadata.name
+        expect(soldat.packages.activatePackage).toHaveBeenCalledWith json.metadata.name
 
       it 'emits an installed event with a copy of the pack including the full package metadata', ->
         spyOn(packageManager, 'emitPackageEvent')
@@ -142,22 +142,22 @@ describe "PackageManager", ->
         onWillThrowError: ->
 
     it "removes the package from the core.disabledPackages list", ->
-      atom.config.set('core.disabledPackages', ['something'])
+      soldat.config.set('core.disabledPackages', ['something'])
 
       packageManager.uninstall {name: 'something'}, ->
 
-      expect(atom.config.get('core.disabledPackages')).toContain('something')
+      expect(soldat.config.get('core.disabledPackages')).toContain('something')
       runCallback(0, '', '')
-      expect(atom.config.get('core.disabledPackages')).not.toContain('something')
+      expect(soldat.config.get('core.disabledPackages')).not.toContain('something')
 
   describe "::installAlternative", ->
     beforeEach ->
-      spyOn(atom.packages, 'activatePackage')
+      spyOn(soldat.packages, 'activatePackage')
       spyOn(packageManager, 'runCommand').andCallFake ->
         onWillThrowError: ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'language-test'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'language-test'))
       waitsFor ->
-        atom.packages.isPackageLoaded('language-test') is true
+        soldat.packages.isPackageLoaded('language-test') is true
 
     it "installs the latest version when a package version is not specified", ->
       installedCallback = jasmine.createSpy()
@@ -176,7 +176,7 @@ describe "PackageManager", ->
       expect(packageManager.runCommand).toHaveBeenCalled()
       expect(packageManager.runCommand.calls[0].args[0]).toEqual(['uninstall', '--hard', 'language-test'])
       expect(packageManager.runCommand.calls[1].args[0]).toEqual(['install', 'a-new-package', '--json'])
-      expect(atom.packages.isPackageLoaded('language-test')).toBe true
+      expect(soldat.packages.isPackageLoaded('language-test')).toBe true
 
       expect(installedEvent).not.toHaveBeenCalled()
       expect(installingEvent).toHaveBeenCalled()
@@ -186,15 +186,15 @@ describe "PackageManager", ->
 
       waits 1
       runs ->
-        expect(atom.packages.activatePackage).not.toHaveBeenCalled()
-        expect(atom.packages.isPackageLoaded('language-test')).toBe false
+        expect(soldat.packages.activatePackage).not.toHaveBeenCalled()
+        expect(soldat.packages.isPackageLoaded('language-test')).toBe false
 
         packageManager.runCommand.calls[1].args[1](0, '', '')
 
       waits 1
       runs ->
-        expect(atom.packages.activatePackage).toHaveBeenCalledWith 'a-new-package'
-        expect(atom.packages.isPackageLoaded('language-test')).toBe false
+        expect(soldat.packages.activatePackage).toHaveBeenCalledWith 'a-new-package'
+        expect(soldat.packages.isPackageLoaded('language-test')).toBe false
 
         expect(installedEvent).toHaveBeenCalled()
         expect(installedEvent.mostRecentCall.args[0]).toEqual eventArg
@@ -205,7 +205,7 @@ describe "PackageManager", ->
 
   describe "::packageHasSettings", ->
     it "returns true when the pacakge has config", ->
-      atom.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
+      soldat.packages.loadPackage(path.join(__dirname, 'fixtures', 'package-with-config'))
       expect(packageManager.packageHasSettings('package-with-config')).toBe true
 
     it "returns false when the pacakge does not have config and doesn't define language grammars", ->
@@ -215,7 +215,7 @@ describe "PackageManager", ->
       packageName = 'language-test'
 
       waitsForPromise ->
-        atom.packages.activatePackage(path.join(__dirname, 'fixtures', packageName))
+        soldat.packages.activatePackage(path.join(__dirname, 'fixtures', packageName))
 
       runs ->
         expect(packageManager.packageHasSettings(packageName)).toBe true
@@ -255,10 +255,10 @@ describe "PackageManager", ->
         onWillThrowError: ->
 
       # Just prevent this stuff from calling through, it doesn't matter for this test
-      spyOn(atom.packages, 'deactivatePackage').andReturn(true)
-      spyOn(atom.packages, 'activatePackage').andReturn(true)
-      spyOn(atom.packages, 'unloadPackage').andReturn(true)
-      spyOn(atom.packages, 'loadPackage').andReturn(true)
+      spyOn(soldat.packages, 'deactivatePackage').andReturn(true)
+      spyOn(soldat.packages, 'activatePackage').andReturn(true)
+      spyOn(soldat.packages, 'unloadPackage').andReturn(true)
+      spyOn(soldat.packages, 'loadPackage').andReturn(true)
 
       packageManager.loadOutdated false, ->
       expect(packageManager.runCommand.calls.length).toBe(0)
@@ -289,7 +289,7 @@ describe "PackageManager", ->
 
     describe "when there is a version pinned package", ->
       beforeEach ->
-        atom.config.set('core.versionPinnedPackages', ['beep'])
+        soldat.config.set('core.versionPinnedPackages', ['beep'])
 
       it "caches results", ->
         spyOn(packageManager, 'runCommand').andCallFake (args, callback) ->
@@ -325,10 +325,10 @@ describe "PackageManager", ->
           onWillThrowError: ->
 
         # Just prevent this stuff from calling through, it doesn't matter for this test
-        spyOn(atom.packages, 'deactivatePackage').andReturn(true)
-        spyOn(atom.packages, 'activatePackage').andReturn(true)
-        spyOn(atom.packages, 'unloadPackage').andReturn(true)
-        spyOn(atom.packages, 'loadPackage').andReturn(true)
+        spyOn(soldat.packages, 'deactivatePackage').andReturn(true)
+        spyOn(soldat.packages, 'activatePackage').andReturn(true)
+        spyOn(soldat.packages, 'unloadPackage').andReturn(true)
+        spyOn(soldat.packages, 'loadPackage').andReturn(true)
 
         packageManager.loadOutdated false, ->
         expect(packageManager.runCommand.calls.length).toBe(0)

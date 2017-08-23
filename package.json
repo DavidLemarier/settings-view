@@ -20,7 +20,7 @@
   },
   "repository": "https://github.com/DavidLemarier/settings-view",
   "engines": {
-    "atom": "*"
+    "soldat": "*"
   },
   "consumedServices": {
     "status-bar": {
